@@ -6,7 +6,7 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
 	&& mv kubectl /usr/local/bin \
 	&& chmod +x /usr/local/bin/kubectl
 
-RUN pip install awscli --upgrade --user
+RUN pip install awscli --upgrade
 
 WORKDIR /app
 COPY run.sh .
