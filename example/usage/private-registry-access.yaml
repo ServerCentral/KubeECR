@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/dockerconfigjson
+metadata:
+  annotations:
+    deft.com/kubeecr: 123456789/us-west-2
+  name: private-registry-access
+  namespace: default
+data:
+  .dockerconfigjson: DUMMY
