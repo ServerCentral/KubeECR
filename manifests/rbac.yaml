@@ -1,0 +1,28 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubeecr
+rules:
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs:
+  - 'patch'
+  - 'get'
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubeecr
+subjects:
+- kind: ServiceAccount
+  name: kubeecr
+roleRef:
+  kind: ClusterRole
+  name: kubeecr
+  apiGroup: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubeecr

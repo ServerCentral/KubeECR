@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kubeecr
+spec:
+  schedule: "0 */6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: kubeecr
+          restartPolicy: Never
+          containers:
+          - name: kubeecr
+            image: ghcr.io/servercentral/kubeecr:main
+            env:
+              - name: AWS_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: kubeecr-aws-secrets
+                    key: AWS_ACCESS_KEY_ID
+              - name: AWS_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: kubeecr-aws-secrets
+                    key: AWS_SECRET_ACCESS_KEY
