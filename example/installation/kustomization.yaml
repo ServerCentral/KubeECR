@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mynamespace
+bases:
+  - https://github.com/ServerCentral/KubeECR/manifests?ref=main
+secretGenerator:
+  - name: kubeecr-aws-secrets
+    literals:
+      - AWS_ACCESS_KEY_ID=xxxxxxxxxx
+      - AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxx
