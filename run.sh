@@ -10,8 +10,9 @@ kubectl get -A secrets -o json \
     set $annotation
     AWS_ACCOUNT=$1
     AWS_DEFAULT_REGION=$2
-    password=$(aws ecr get-login-password)
     registry="$AWS_ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
+    echo "$namespace/$name: $AWS_ACCOUNT $AWS_DEFAULT_REGION $registry"
+    password=$(aws ecr get-login-password)
     auth=$(echo "AWS:$password" | base64)
     dockerconfig=$(jq -n ".auths[\"$registry\"].auth = \"$auth\"" | base64)
     patch=$(jq -n ".data[\".dockerconfigjson\"] = \"$dockerconfig\"")
