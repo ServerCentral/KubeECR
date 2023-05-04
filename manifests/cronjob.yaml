@@ -12,7 +12,7 @@ spec:
           restartPolicy: Never
           containers:
           - name: kubeecr
-            image: ghcr.io/servercentral/kubeecr:main
+            image: ghcr.io/servercentral/kubeecr:latest
             env:
               - name: AWS_ACCESS_KEY_ID
                 valueFrom:
