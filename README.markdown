@@ -42,3 +42,8 @@ metadata:
 ```
 
 A usage example can be seen in `examples/usage/`, which contains a dummy application and its imagePullSecrets which contains the annotation.
+
+# Thanks
+
+Work on KubeECR was sponsored by [Deft](deft.com) (formerly ServerCentral).
+Deft provides AWS consulting, server colocation, and other managed services.
