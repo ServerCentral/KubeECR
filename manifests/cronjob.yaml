@@ -24,3 +24,11 @@ spec:
                   secretKeyRef:
                     name: kubeecr-aws-secrets
                     key: AWS_SECRET_ACCESS_KEY
+              - name: AWS_REGION
+                value: us-east-1
+              - name: AWS_ACCOUNT
+                value: '123456789'
+              - name: KUBEECR_SELECTOR
+                value: 'kubeecr=aws-prod'
+              - name: KUBEECR_NAMESPACE
+                value: default

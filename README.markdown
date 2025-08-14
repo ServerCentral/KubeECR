@@ -11,7 +11,7 @@ Many such examples exist online however they typically want to have the secret n
 While these examples will work, they don't follow typical kubernetes design patterns.
 
 KubeECR is different.
-Rather than specify the secret to create, then continually recreate it, KubeECR looks for existing secrets with an annotation.
+Rather than specify the secret to create, then continually recreate it, KubeECR looks for existing secrets with a label.
 Those secrets are then updated in-place.
 In this way, all existing Kubernetes tooling, including for example common deployment mechanisms or visualisations that rely on parent references, continue to work.
 Meanwhile the secrets declare themselves as needing updating rather than changing the updater config.
@@ -29,21 +29,15 @@ That example shows how to create the necessary secret as well.
 
 ## Usage
 
-During installation, you should have setup the AWS access, however it does not contain the information about the ECR registry to be logged into.
-This is contained within the annotations on the secrets themselves.
+KubeECR must also be configured to select which secrets to update.
+This is done by the use of `KUBEECR_SELECTOR` attribute which takes the for given [here](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#list-and-watch-filtering) (no need for the `-l` that is added for you).
+Additionally if `KUBEECR_NAMESPACE` is specified, only secrets in that namespace will be considered.
 
-To configure a secret to be updated by KubeECR, add the annotation `deft.com/kubeecr` whose value is the account number and region combined with a `/`.
-For example:
+For example, to configure a secret to be updated by KubeECR, add the label `kubeecr=prod` and then set `KUBEECR_SELECTOR=kubeecr=prod` in the environment of your cronjob.
 
-```yaml
-metadata:
-  annotations:
-    deft.com/kubeecr: 123456789/us-west-2
-```
-
-A usage example can be seen in `examples/usage/`, which contains a dummy application and its imagePullSecrets which contains the annotation.
+A usage example can be seen in `examples/usage/`, which contains a dummy application and its imagePullSecrets.
 
 # Thanks
 
-Work on KubeECR was sponsored by [Deft](deft.com) (formerly ServerCentral).
+Work on KubeECR was sponsored by [Summit](summithq.com) (formerly Deft, formerly ServerCentral).
 Deft provides AWS consulting, server colocation, and other managed services.

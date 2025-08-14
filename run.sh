@@ -2,25 +2,35 @@
 
 set -e
 
+echo "Running KubeECR"
+echo "Account: ${AWS_ACCOUNT:?AWS_ACCOUNT is required}"
+echo "Region: ${AWS_REGION:?AWS_REGION is required}"
+echo "Selector: ${KUBEECR_SELECTOR:?KUBEECR_SELECTOR is required}"
+
+if [[ -n $KUBEECR_NAMESPACE ]]
+then
+  echo "Namespace: $KUBEECR_NAMESPACE"
+  export ns_filter="-n $KUBEECR_NAMESPACE"
+else
+  echo "All Namespaces"
+  export ns_filter="-A"
+fi
+
 count=0
 
-while IFS=$'\t' read -r name namespace annotation
+while IFS=$'\t' read -r name namespace
 do
-  IFS="/"
-  set $annotation
-  AWS_ACCOUNT=$1
-  AWS_DEFAULT_REGION=$2
-  registry="$AWS_ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
-  echo "updating $namespace/$name: $AWS_ACCOUNT $AWS_DEFAULT_REGION $registry"
-  password=$(aws ecr get-login-password --region $AWS_DEFAULT_REGION)
-  auth=$(echo "AWS:$password" | base64)
-  dockerconfig=$(jq -n ".auths[\"$registry\"].auth = \"$auth\"" | base64)
-  patch=$(jq -n ".data[\".dockerconfigjson\"] = \"$dockerconfig\"")
-  kubectl patch -n $namespace secret $name -p $patch
+  registry="$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
+  echo "Updating secret $namespace/$name for registry: $registry"
+  password=$(aws ecr get-login-password)
+  auth=$(echo -n "AWS:$password" | base64)
+  dockerconfig=$(jq -cn ".auths[\"$registry\"].auth = \"$auth\"" | base64)
+  patch=$(jq -cn ".data[\".dockerconfigjson\"] = \"$dockerconfig\"")
+  kubectl patch -n $namespace secret $name -p "$patch"
   ((count++))
 done < <( \
-  kubectl get -A secrets -o json \
-  | jq -r '.items[].metadata | select(.annotations | has("deft.com/kubeecr")) | [.name, .namespace, .annotations."deft.com/kubeecr"] | @tsv' \
+  kubectl get $ns_filter secrets -l "$KUBEECR_SELECTOR" -o json \
+  | jq -r '.items[].metadata | [.name, .namespace] | @tsv' \
 )
 
-echo "updates complete: $count secrets updated"
+echo "Updates complete: $count secrets updated"
