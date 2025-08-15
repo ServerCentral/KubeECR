@@ -21,8 +21,6 @@ else
   export ns_filter="-A"
 fi
 
-count=0
-
 while IFS=$'\t' read -r name namespace
 do
   registry="$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com"
@@ -32,10 +30,9 @@ do
   dockerconfig=$(jq -cn ".auths[\"$registry\"].auth = \"$auth\"" | base64)
   patch=$(jq -cn ".data[\".dockerconfigjson\"] = \"$dockerconfig\"")
   kubectl patch -n $namespace secret $name -p "$patch"
-  ((count++))
 done < <( \
   kubectl get $ns_filter secrets -l "$KUBEECR_SELECTOR" -o json \
   | jq -r '.items[].metadata | [.name, .namespace] | @tsv' \
 )
 
-echo "Updates complete: $count secrets updated"
+exit 0
