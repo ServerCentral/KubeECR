@@ -1,6 +1,11 @@
 #!/bin/bash
 
-set -e
+if [[ $KUBEECR_DEBUG ]]
+then
+  set -euxo pipefail
+else
+  set -e
+fi
 
 echo "Running KubeECR"
 echo "Account: ${AWS_ACCOUNT:?AWS_ACCOUNT is required}"
